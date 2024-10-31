@@ -19,6 +19,7 @@ const AppLayout = () => {
   const handleLogout = () => {
     setToken(null);
     setIsAuthenticated(false);
+    localStorage.removeItem("authToken");
   };
 
   return (
