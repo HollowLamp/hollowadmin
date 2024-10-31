@@ -1,28 +1,32 @@
 .header {
   display: flex;
   align-items: center;
-  background-color: transparent;
-  @media (max-width: $mantine-breakpoint-sm) {
-    border: none;
-  }
   justify-content: space-between;
-}
-
-.img {
-  padding-left: 75px;
-  @media (max-width: $mantine-breakpoint-sm) {
-    padding-right: 10px;
-    padding-left: 0px;
-  }
+  background-color: light-dark(
+    var(--mantine-color-gray-0),
+    var(--mantine-color-dark-6)
+  );
 }
 
 .nav {
+  background-color: light-dark(
+    var(--mantine-color-gray-0),
+    var(--mantine-color-dark-6)
+  );
   @media (max-width: $mantine-breakpoint-sm) {
     max-width: 30%;
     box-shadow: var(--mantine-shadow-md);
   }
 }
 
-.main {
-  background-color: var(--mantine-color-gray-1);
+.img {
+  margin-left: 75px;
+  @media (max-width: $mantine-breakpoint-sm) {
+    margin-left: 100px;
+    box-shadow: var(--mantine-shadow-md);
+  }
+}
+
+.menuItem {
+  text-align: center;
 }

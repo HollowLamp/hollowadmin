@@ -9,7 +9,7 @@ const PageHeader = ({ title }: PageHeaderProps) => {
   return (
     <Paper
       shadow="xs"
-      p="md"
+      p="xs"
       classNames={{
         root: style.paper,
       }}
