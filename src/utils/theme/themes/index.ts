@@ -1,10 +1,12 @@
 import { blue } from "./blue";
-import { forest } from "./forest";
+import { yellow } from "./yellow";
 import { createMantineTheme } from "../create-mantine-theme";
+import { red } from "./red";
 
 export const themes = {
   blue,
-  forest,
+  yellow,
+  red,
 };
 
 export type ThemeName = keyof typeof themes;
@@ -14,6 +16,4 @@ export type Theme = {
   mantineTheme: ReturnType<typeof createMantineTheme>;
 };
 
-export const sortedThemeNames = Object.keys(themes)
-  .map((key) => key as ThemeName)
-  .sort();
+export const themeNames = Object.keys(themes).map((key) => key as ThemeName);

@@ -5,7 +5,7 @@ import { SchemeToggleButton } from "../schemetoggle/SchemeToggle";
 import style from "./style.module.css";
 
 const ThemeSwitcher = () => {
-  const { currentThemeName, setCurrentThemeName, sortedThemeNames, themes } =
+  const { currentThemeName, setCurrentThemeName, themeNames, themes } =
     useThemes();
 
   return (
@@ -15,15 +15,15 @@ const ThemeSwitcher = () => {
         <Select
           value={currentThemeName}
           onChange={(value) => {
-            if (value && sortedThemeNames.includes(value as ThemeName)) {
+            if (value && themeNames.includes(value as ThemeName)) {
               setCurrentThemeName(value as ThemeName);
             }
           }}
-          data={sortedThemeNames.map((themeName) => ({
+          data={themeNames.map((themeName) => ({
             value: themeName,
             label: themes[themeName].label,
           }))}
-          styles={{ input: { width: 100 } }}
+          styles={{ input: { width: 90 } }}
         />
       </Group>
     </div>

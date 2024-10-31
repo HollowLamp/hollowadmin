@@ -94,8 +94,6 @@ export function createMantineTheme({
       black: `hsl(${baseHue} 10% 10%)`,
       white: `hsl(${baseHue} 10% 94%)`,
       primaryColor: "primary",
-      fontFamily: "Roboto",
-      headings: { fontFamily: "Roboto" },
       defaultRadius: "md",
       ...custom,
     })

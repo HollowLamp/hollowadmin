@@ -1,7 +1,7 @@
 import { createMantineTheme } from "../create-mantine-theme";
 
 export const blue = {
-  label: "🌊 蓝",
+  label: "蓝",
   mantineTheme: createMantineTheme({
     baseHue: 250,
     baseSaturation: 30,

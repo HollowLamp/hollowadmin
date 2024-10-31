@@ -66,7 +66,7 @@ const SidebarItem = ({
         to={path}
         onClick={handleClick}
         childrenOffset={children ? 20 : 0}
-        active={location.pathname === path} // 设置活跃态
+        active={location.pathname === path}
       >
         {children &&
           children.map((child) => (
@@ -76,7 +76,7 @@ const SidebarItem = ({
               component={Link}
               to={child.path}
               onClick={isMobile ? closeNavbar : undefined}
-              active={location.pathname === child.path} // 子链接的活跃态
+              active={location.pathname === child.path}
             />
           ))}
       </NavLink>
