@@ -61,11 +61,18 @@ const Category = () => {
       slug: "",
     },
     validate: {
-      name: (value) => (value ? null : "名称不能为空"),
       slug: (value) =>
-        value && /^[a-zA-Z0-9_]+$/.test(value)
+        !value || /^[a-zA-Z0-9_]+$/.test(value)
           ? null
           : "Slug 只能包含字母、数字和下划线",
+    },
+    transformValues: (values) => {
+      const filteredEntries = Object.entries(values).filter(
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        ([_, value]) => value !== undefined && value !== null && value !== ""
+      );
+
+      return Object.fromEntries(filteredEntries) as UpdateCategoryDto;
     },
   });
 
@@ -76,17 +83,20 @@ const Category = () => {
     createForm.reset();
   };
 
-  const handleEditSubmit = (values: UpdateCategoryDto) => {
+  const handleEditSubmit = () => {
     if (editingCategory) {
+      const filteredValues = editForm.getTransformedValues();
+
       updateCategoryMutation.mutate(
         {
           id: editingCategory.id,
-          categoryData: values,
+          categoryData: filteredValues,
         },
         {
           onSuccess: () => setEditModalOpened(false),
         }
       );
+
       setEditingCategory(null);
       editForm.reset();
     }
