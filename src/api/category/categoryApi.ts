@@ -27,6 +27,6 @@ export const deleteCategory = async (id: number): Promise<void> => {
 };
 
 export const getAllCategories = async (): Promise<Category[]> => {
-  const response = await axiosInstance.get<Category[]>("/categories");
+  const response = await axiosInstance.get<Category[]>("/admin/categories/");
   return response.data;
 };

@@ -10,6 +10,9 @@ import {
   Loader,
   Alert,
   Table,
+  Center,
+  Space,
+  Text,
 } from "@mantine/core";
 import style from "./style.module.css";
 import { useState } from "react";
@@ -147,18 +150,22 @@ const Category = () => {
           </Alert>
         ) : (
           <Card.Section>
-            <Table withRowBorders={true} style={{ position: "relative" }}>
-              <tbody>
+            <Table withRowBorders={false} highlightOnHover>
+              <Table.Tbody>
                 {categories?.map((category) => (
-                  <tr key={category.id}>
-                    <td style={{ width: "70%" }}>
-                      <Group>
+                  <Table.Tr key={category.id}>
+                    <Table.Td>
+                      <Center>
                         <Title order={4}>{category.name}</Title>
+                        <Space w="xl" />
                         <p className={style.slug}>{category.slug}</p>
-                      </Group>
-                    </td>
-                    <td style={{ width: "30%" }}>
-                      <Group>
+                      </Center>
+                    </Table.Td>
+                    <Table.Td>
+                      <Text>文章数：{category.articleCount}</Text>
+                    </Table.Td>
+                    <Table.Td>
+                      <Center>
                         <Button
                           variant="subtle"
                           onClick={() => handleEditCategory(category)}
@@ -172,11 +179,11 @@ const Category = () => {
                         >
                           删除
                         </Button>
-                      </Group>
-                    </td>
-                  </tr>
+                      </Center>
+                    </Table.Td>
+                  </Table.Tr>
                 ))}
-              </tbody>
+              </Table.Tbody>
             </Table>
           </Card.Section>
         )}

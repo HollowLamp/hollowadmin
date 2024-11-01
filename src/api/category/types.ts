@@ -2,6 +2,7 @@ export interface Category {
   id: number;
   name: string;
   slug: string;
+  articleCount: number;
 }
 
 export interface CreateCategoryDto {
