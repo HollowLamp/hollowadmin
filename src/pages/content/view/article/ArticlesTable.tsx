@@ -14,8 +14,10 @@ import { useArticles } from "@/hooks/use-content";
 import { useGetAllCategories } from "@/hooks/use-category";
 import { format } from "date-fns";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const ArticlesTable = () => {
+  const navigate = useNavigate();
   const { getAll, remove } = useArticles();
   const { data: categories, isLoading: loadingCategories } =
     useGetAllCategories();
@@ -139,7 +141,7 @@ const ArticlesTable = () => {
         <Button onClick={handleSearch}>搜索</Button>
       </Group>
 
-      <Table>
+      <Table highlightOnHover>
         <Table.Thead>
           <Table.Tr>
             <Table.Th>ID</Table.Th>
@@ -174,7 +176,23 @@ const ArticlesTable = () => {
               </Table.Td>
               <Table.Td>
                 <Center>
-                  <Button variant="subtle">编辑</Button>
+                  <Button
+                    variant="subtle"
+                    onClick={() =>
+                      navigate(`/content/edit/${article.id}`, {
+                        state: {
+                          contentType: "article",
+                          title: article.title,
+                          slug: article.slug,
+                          categoryId: article.categoryId,
+                          content: article.content,
+                          status: article.status,
+                        },
+                      })
+                    }
+                  >
+                    编辑
+                  </Button>
                   <Button
                     color="red"
                     variant="subtle"

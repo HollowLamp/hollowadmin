@@ -13,8 +13,10 @@ import {
 import { useNotes } from "@/hooks/use-content";
 import { format } from "date-fns";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const NotesTable = () => {
+  const navigate = useNavigate();
   const { getAll, remove } = useNotes();
   const [deleteModalOpened, setDeleteModalOpened] = useState(false);
   const [selectedNoteId, setSelectedNoteId] = useState<number | null>(null);
@@ -118,7 +120,7 @@ const NotesTable = () => {
         <Button onClick={handleSearch}>搜索</Button>
       </Group>
 
-      <Table>
+      <Table highlightOnHover>
         <Table.Thead>
           <Table.Tr>
             <Table.Th>ID</Table.Th>
@@ -145,7 +147,21 @@ const NotesTable = () => {
               </Table.Td>
               <Table.Td>
                 <Center>
-                  <Button variant="subtle">编辑</Button>
+                  <Button
+                    variant="subtle"
+                    onClick={() =>
+                      navigate(`/content/edit/${note.id}`, {
+                        state: {
+                          contentType: "note",
+                          title: note.title,
+                          content: note.content,
+                          status: note.status,
+                        },
+                      })
+                    }
+                  >
+                    编辑
+                  </Button>
                   <Button
                     color="red"
                     variant="subtle"

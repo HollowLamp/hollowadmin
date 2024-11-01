@@ -13,8 +13,10 @@ import {
 import { useThoughts } from "@/hooks/use-content";
 import { format } from "date-fns";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const ThoughtTable = () => {
+  const navigate = useNavigate();
   const { getAll, remove } = useThoughts();
   const [deleteModalOpened, setDeleteModalOpened] = useState(false);
   const [selectedThoughtId, setSelectedThoughtId] = useState<number | null>(
@@ -108,7 +110,7 @@ const ThoughtTable = () => {
         <Button onClick={handleSearch}>搜索</Button>
       </Group>
 
-      <Table>
+      <Table highlightOnHover>
         <Table.Thead>
           <Table.Tr>
             <Table.Th>ID</Table.Th>
@@ -129,7 +131,20 @@ const ThoughtTable = () => {
               </Table.Td>
               <Table.Td>
                 <Center>
-                  <Button variant="subtle">编辑</Button>
+                  <Button
+                    variant="subtle"
+                    onClick={() =>
+                      navigate(`/content/edit/${thought.id}`, {
+                        state: {
+                          contentType: "thought",
+                          content: thought.content,
+                          status: thought.status,
+                        },
+                      })
+                    }
+                  >
+                    编辑
+                  </Button>
                   <Button
                     color="red"
                     variant="subtle"
