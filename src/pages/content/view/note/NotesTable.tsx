@@ -9,24 +9,40 @@ import {
   Group,
   Select,
   TextInput,
+  Pagination,
 } from "@mantine/core";
 import { useNotes } from "@/hooks/use-content";
 import { format } from "date-fns";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 const NotesTable = () => {
   const navigate = useNavigate();
-  const { getAll, remove } = useNotes();
-  const [deleteModalOpened, setDeleteModalOpened] = useState(false);
-  const [selectedNoteId, setSelectedNoteId] = useState<number | null>(null);
-  const [statusFilter, setStatusFilter] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [statusFilter, setStatusFilter] = useState<string | undefined>(
+    undefined
+  );
   const [sortField, setSortField] = useState<"createdAt" | "updatedAt">(
     "createdAt"
   );
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const [searchKeyword, setSearchKeyword] = useState<string>("");
   const [searchValue, setSearchValue] = useState<string>("");
+
+  const { getAll, remove, refetch } = useNotes(
+    page,
+    10,
+    statusFilter,
+    sortField,
+    sortOrder,
+    searchValue
+  );
+  const [deleteModalOpened, setDeleteModalOpened] = useState(false);
+  const [selectedNoteId, setSelectedNoteId] = useState<number | null>(null);
+
+  useEffect(() => {
+    refetch();
+  }, [page, statusFilter, sortField, sortOrder, searchValue, refetch]);
 
   const openDeleteModal = (id: number) => {
     setSelectedNoteId(id);
@@ -42,6 +58,7 @@ const NotesTable = () => {
   };
 
   const handleSearch = () => {
+    setPage(1);
     setSearchValue(searchKeyword);
   };
 
@@ -63,23 +80,10 @@ const NotesTable = () => {
     );
   }
 
-  let filteredData = statusFilter
-    ? getAll.data?.filter((note) => note.status === statusFilter)
-    : getAll.data;
-
-  if (searchValue.trim() && filteredData) {
-    filteredData = filteredData.filter((note) =>
-      note.title.toLowerCase().includes(searchValue.toLowerCase())
-    );
-  }
-
-  if (filteredData) {
-    filteredData = [...filteredData].sort((a, b) => {
-      const dateA = new Date(a[sortField]).getTime();
-      const dateB = new Date(b[sortField]).getTime();
-      return sortOrder === "asc" ? dateA - dateB : dateB - dateA;
-    });
-  }
+  const notesData = getAll.data?.data || [];
+  const totalItems = getAll.data?.total || 0;
+  const itemsPerPage = getAll.data?.limit || 10;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
 
   return (
     <>
@@ -91,7 +95,7 @@ const NotesTable = () => {
             { value: "hidden", label: "隐藏" },
           ]}
           value={statusFilter}
-          onChange={(value) => setStatusFilter(value)}
+          onChange={(value) => setStatusFilter(value ?? undefined)}
         />
         <Select
           placeholder="选择排序字段"
@@ -132,7 +136,7 @@ const NotesTable = () => {
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
-          {filteredData?.map((note) => (
+          {notesData.map((note) => (
             <Table.Tr key={note.id}>
               <Table.Td>{note.id}</Table.Td>
               <Table.Td>{note.title}</Table.Td>
@@ -175,6 +179,8 @@ const NotesTable = () => {
           ))}
         </Table.Tbody>
       </Table>
+
+      <Pagination total={totalPages} value={page} onChange={setPage} mt="md" />
 
       <Modal
         opened={deleteModalOpened}

@@ -13,6 +13,7 @@ import {
   Center,
   Space,
   Text,
+  Pagination,
 } from "@mantine/core";
 import style from "./style.module.css";
 import { useState } from "react";
@@ -30,12 +31,20 @@ import {
 } from "@/api/category/types";
 
 const Category = () => {
+  const [page, setPage] = useState(1);
+  const [limit] = useState(10);
   const [createModalOpened, setCreateModalOpened] = useState(false);
   const [editModalOpened, setEditModalOpened] = useState(false);
   const [editingCategory, setEditingCategory] = useState<CategoryType | null>(
     null
   );
-  const { data: categories, isLoading, error } = useGetAllCategories();
+  const {
+    data: paginatedResponse,
+    isLoading,
+    error,
+  } = useGetAllCategories(page, limit);
+  const categories = paginatedResponse?.data || [];
+  const totalItems = paginatedResponse?.total || 0;
   const createCategoryMutation = useCreateCategory();
   const updateCategoryMutation = useUpdateCategory();
   const deleteCategoryMutation = useDeleteCategory();
@@ -74,7 +83,6 @@ const Category = () => {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         ([_, value]) => value !== undefined && value !== null && value !== ""
       );
-
       return Object.fromEntries(filteredEntries) as UpdateCategoryDto;
     },
   });
@@ -89,7 +97,6 @@ const Category = () => {
   const handleEditSubmit = () => {
     if (editingCategory) {
       const filteredValues = editForm.getTransformedValues();
-
       updateCategoryMutation.mutate(
         {
           id: editingCategory.id,
@@ -99,7 +106,6 @@ const Category = () => {
           onSuccess: () => setEditModalOpened(false),
         }
       );
-
       setEditingCategory(null);
       editForm.reset();
     }
@@ -149,43 +155,53 @@ const Category = () => {
             无法加载分类列表，请稍后重试。
           </Alert>
         ) : (
-          <Card.Section>
-            <Table withRowBorders={false} highlightOnHover>
-              <Table.Tbody>
-                {categories?.map((category) => (
-                  <Table.Tr key={category.id}>
-                    <Table.Td>
-                      <Center>
-                        <Title order={4}>{category.name}</Title>
-                        <Space w="xl" />
-                        <p className={style.slug}>{category.slug}</p>
-                      </Center>
-                    </Table.Td>
-                    <Table.Td>
-                      <Text>文章数：{category.articleCount}</Text>
-                    </Table.Td>
-                    <Table.Td>
-                      <Center>
-                        <Button
-                          variant="subtle"
-                          onClick={() => handleEditCategory(category)}
-                        >
-                          编辑
-                        </Button>
-                        <Button
-                          color="red"
-                          variant="subtle"
-                          onClick={() => handleDeleteCategory(category.id)}
-                        >
-                          删除
-                        </Button>
-                      </Center>
-                    </Table.Td>
-                  </Table.Tr>
-                ))}
-              </Table.Tbody>
-            </Table>
-          </Card.Section>
+          <>
+            <Card.Section>
+              <Table withRowBorders={false} highlightOnHover>
+                <Table.Tbody>
+                  {categories.map((category) => (
+                    <Table.Tr key={category.id}>
+                      <Table.Td>
+                        <Center>
+                          <Title order={4}>{category.name}</Title>
+                          <Space w="xl" />
+                          <p className={style.slug}>{category.slug}</p>
+                        </Center>
+                      </Table.Td>
+                      <Table.Td>
+                        <Text>文章数：{category.articleCount}</Text>
+                      </Table.Td>
+                      <Table.Td>
+                        <Center>
+                          <Button
+                            variant="subtle"
+                            onClick={() => handleEditCategory(category)}
+                          >
+                            编辑
+                          </Button>
+                          <Button
+                            color="red"
+                            variant="subtle"
+                            onClick={() => handleDeleteCategory(category.id)}
+                          >
+                            删除
+                          </Button>
+                        </Center>
+                      </Table.Td>
+                    </Table.Tr>
+                  ))}
+                </Table.Tbody>
+              </Table>
+            </Card.Section>
+            <Center>
+              <Pagination
+                total={Math.ceil(totalItems / limit)}
+                value={page}
+                onChange={setPage}
+                mt="md"
+              />
+            </Center>
+          </>
         )}
       </Card>
 

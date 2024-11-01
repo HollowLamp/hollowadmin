@@ -1,4 +1,9 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  keepPreviousData,
+} from "@tanstack/react-query";
 import {
   createCategory,
   updateCategory,
@@ -10,11 +15,13 @@ import {
   CreateCategoryDto,
   UpdateCategoryDto,
 } from "@/api/category/types";
+import { PaginatedResponse } from "@/api/config";
 
-export const useGetAllCategories = () => {
-  return useQuery<Category[]>({
-    queryKey: ["allCategories"],
-    queryFn: getAllCategories,
+export const useGetAllCategories = (page: number = 1, limit: number = 10) => {
+  return useQuery<PaginatedResponse<Category>>({
+    queryKey: ["allCategories", page, limit],
+    queryFn: () => getAllCategories(page, limit),
+    placeholderData: keepPreviousData,
   });
 };
 

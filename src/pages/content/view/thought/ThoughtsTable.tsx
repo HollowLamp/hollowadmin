@@ -9,23 +9,38 @@ import {
   Group,
   Select,
   TextInput,
+  Pagination,
 } from "@mantine/core";
 import { useThoughts } from "@/hooks/use-content";
 import { format } from "date-fns";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 const ThoughtTable = () => {
   const navigate = useNavigate();
-  const { getAll, remove } = useThoughts();
+  const [page, setPage] = useState(1);
+  const [statusFilter, setStatusFilter] = useState<string | undefined>(
+    undefined
+  );
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+  const [searchKeyword, setSearchKeyword] = useState<string>("");
+  const [searchValue, setSearchValue] = useState<string>("");
+
+  const { getAll, remove, refetch } = useThoughts(
+    page,
+    10,
+    statusFilter,
+    sortOrder,
+    searchValue
+  );
   const [deleteModalOpened, setDeleteModalOpened] = useState(false);
   const [selectedThoughtId, setSelectedThoughtId] = useState<number | null>(
     null
   );
-  const [statusFilter, setStatusFilter] = useState<string | null>(null);
-  const [sortOrder, setSortOrder] = useState<string | null>("desc");
-  const [searchKeyword, setSearchKeyword] = useState<string>("");
-  const [searchValue, setSearchValue] = useState<string>("");
+
+  useEffect(() => {
+    refetch();
+  }, [page, statusFilter, sortOrder, searchValue, refetch]);
 
   const openDeleteModal = (id: number) => {
     setSelectedThoughtId(id);
@@ -41,6 +56,7 @@ const ThoughtTable = () => {
   };
 
   const handleSearch = () => {
+    setPage(1);
     setSearchValue(searchKeyword);
   };
 
@@ -62,23 +78,10 @@ const ThoughtTable = () => {
     );
   }
 
-  let filteredData = statusFilter
-    ? getAll.data?.filter((thought) => thought.status === statusFilter)
-    : getAll.data;
-
-  if (searchValue.trim() && filteredData) {
-    filteredData = filteredData.filter((thought) =>
-      thought.content.toLowerCase().includes(searchValue.toLowerCase())
-    );
-  }
-
-  if (filteredData) {
-    filteredData = [...filteredData].sort((a, b) => {
-      const dateA = new Date(a.createdAt).getTime();
-      const dateB = new Date(b.createdAt).getTime();
-      return sortOrder === "asc" ? dateA - dateB : dateB - dateA;
-    });
-  }
+  const thoughtsData = getAll.data?.data || [];
+  const totalItems = getAll.data?.total || 0;
+  const itemsPerPage = getAll.data?.limit || 10;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
 
   return (
     <>
@@ -90,7 +93,7 @@ const ThoughtTable = () => {
             { value: "hidden", label: "隐藏" },
           ]}
           value={statusFilter}
-          onChange={setStatusFilter}
+          onChange={(value) => setStatusFilter(value ?? undefined)}
         />
         <Select
           placeholder="选择排序"
@@ -99,7 +102,7 @@ const ThoughtTable = () => {
             { value: "desc", label: "最新" },
           ]}
           value={sortOrder}
-          onChange={setSortOrder}
+          onChange={(value) => setSortOrder(value as "asc" | "desc")}
         />
         <TextInput
           placeholder="搜索内容"
@@ -120,7 +123,7 @@ const ThoughtTable = () => {
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
-          {filteredData?.map((thought) => (
+          {thoughtsData.map((thought) => (
             <Table.Tr key={thought.id}>
               <Table.Td>{thought.id}</Table.Td>
               <Table.Td>
@@ -158,6 +161,8 @@ const ThoughtTable = () => {
           ))}
         </Table.Tbody>
       </Table>
+
+      <Pagination total={totalPages} value={page} onChange={setPage} mt="md" />
 
       <Modal
         opened={deleteModalOpened}

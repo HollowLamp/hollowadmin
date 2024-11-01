@@ -9,30 +9,57 @@ import {
   Group,
   Select,
   TextInput,
+  Pagination,
 } from "@mantine/core";
 import { useArticles } from "@/hooks/use-content";
 import { useGetAllCategories } from "@/hooks/use-category";
 import { format } from "date-fns";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 const ArticlesTable = () => {
   const navigate = useNavigate();
-  const { getAll, remove } = useArticles();
-  const { data: categories, isLoading: loadingCategories } =
-    useGetAllCategories();
-  const [deleteModalOpened, setDeleteModalOpened] = useState(false);
-  const [selectedArticleId, setSelectedArticleId] = useState<number | null>(
-    null
+  const [page, setPage] = useState(1);
+  const [statusFilter, setStatusFilter] = useState<string | undefined>(
+    undefined
   );
-  const [statusFilter, setStatusFilter] = useState<string | null>(null);
-  const [categoryFilter, setCategoryFilter] = useState<number | null>(null);
+  const [categoryFilter, setCategoryFilter] = useState<number | undefined>(
+    undefined
+  );
+
   const [sortField, setSortField] = useState<"createdAt" | "updatedAt">(
     "createdAt"
   );
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const [searchKeyword, setSearchKeyword] = useState<string>("");
   const [searchValue, setSearchValue] = useState<string>("");
+  const { data: categories, isLoading: loadingCategories } =
+    useGetAllCategories();
+  const { getAll, remove, refetch } = useArticles(
+    page,
+    10,
+    statusFilter,
+    categoryFilter,
+    sortField,
+    sortOrder,
+    searchValue
+  );
+  const [deleteModalOpened, setDeleteModalOpened] = useState(false);
+  const [selectedArticleId, setSelectedArticleId] = useState<number | null>(
+    null
+  );
+
+  useEffect(() => {
+    refetch();
+  }, [
+    page,
+    statusFilter,
+    categoryFilter,
+    sortField,
+    sortOrder,
+    searchValue,
+    refetch,
+  ]);
 
   const openDeleteModal = (id: number) => {
     setSelectedArticleId(id);
@@ -48,6 +75,7 @@ const ArticlesTable = () => {
   };
 
   const handleSearch = () => {
+    setPage(1);
     setSearchValue(searchKeyword);
   };
 
@@ -69,29 +97,10 @@ const ArticlesTable = () => {
     );
   }
 
-  let filteredData = statusFilter
-    ? getAll.data?.filter((article) => article.status === statusFilter)
-    : getAll.data;
-
-  if (categoryFilter && filteredData) {
-    filteredData = filteredData.filter(
-      (article) => article.categoryId === categoryFilter
-    );
-  }
-
-  if (searchValue.trim() && filteredData) {
-    filteredData = filteredData.filter((article) =>
-      article.title.toLowerCase().includes(searchValue.toLowerCase())
-    );
-  }
-
-  if (filteredData) {
-    filteredData = [...filteredData].sort((a, b) => {
-      const dateA = new Date(a[sortField]).getTime();
-      const dateB = new Date(b[sortField]).getTime();
-      return sortOrder === "asc" ? dateA - dateB : dateB - dateA;
-    });
-  }
+  const articlesData = getAll.data?.data || [];
+  const totalItems = getAll.data?.total || 0;
+  const itemsPerPage = getAll.data?.limit || 10;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
 
   return (
     <>
@@ -103,11 +112,11 @@ const ArticlesTable = () => {
             { value: "hidden", label: "隐藏" },
           ]}
           value={statusFilter}
-          onChange={(value) => setStatusFilter(value)}
+          onChange={(value) => setStatusFilter(value ?? undefined)}
         />
         <Select
           placeholder="选择分类"
-          data={categories.map((category) => ({
+          data={categories.data.map((category) => ({
             value: category.id.toString(),
             label: category.name,
           }))}
@@ -154,7 +163,7 @@ const ArticlesTable = () => {
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
-          {filteredData?.map((article) => (
+          {articlesData.map((article) => (
             <Table.Tr key={article.id}>
               <Table.Td>{article.id}</Table.Td>
               <Table.Td>{article.title}</Table.Td>
@@ -163,7 +172,7 @@ const ArticlesTable = () => {
               </Table.Td>
               <Table.Td>
                 {
-                  categories.find(
+                  categories.data.find(
                     (category) => category.id === article.categoryId
                   )?.name
                 }
@@ -206,6 +215,8 @@ const ArticlesTable = () => {
           ))}
         </Table.Tbody>
       </Table>
+
+      <Pagination total={totalPages} value={page} onChange={setPage} mt="md" />
 
       <Modal
         opened={deleteModalOpened}

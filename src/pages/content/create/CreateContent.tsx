@@ -203,9 +203,9 @@ const CreateContent: React.FC = () => {
               required
               placeholder="选择分类"
               data={
-                loadingCategories
+                loadingCategories || !categories?.data
                   ? []
-                  : categories?.map((category) => ({
+                  : categories.data.map((category) => ({
                       value: category.id.toString(),
                       label: category.name,
                     }))

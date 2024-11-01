@@ -10,6 +10,7 @@ import {
   CreateThoughtDto,
   UpdateThoughtDto,
 } from "./types";
+import { PaginatedResponse } from "../config";
 
 export const createArticle = async (
   data: CreateArticleDto
@@ -33,18 +34,28 @@ export const deleteArticle = async (id: number): Promise<void> => {
   await axiosInstance.delete(`/admin/articles/${id}`);
 };
 
-export const getAllArticles = async (): Promise<Article[]> => {
-  const response = await axiosInstance.get<Article[]>("/admin/articles");
-  return response.data;
-};
+export const getAllArticles = async (
+  page: number = 1,
+  limit: number = 10,
+  status?: string,
+  categoryId?: number,
+  sortField: string = "createdAt",
+  sortOrder: string = "desc",
+  search?: string
+): Promise<PaginatedResponse<Article>> => {
+  const params = new URLSearchParams({
+    page: page.toString(),
+    limit: limit.toString(),
+  });
+  if (status) params.append("status", status);
+  if (categoryId) params.append("categoryId", categoryId.toString());
+  if (sortField) params.append("sortField", sortField);
+  if (sortOrder) params.append("sortOrder", sortOrder);
+  if (search) params.append("search", search);
 
-export const getPublishedArticles = async (): Promise<Article[]> => {
-  const response = await axiosInstance.get<Article[]>("/articles");
-  return response.data;
-};
-
-export const getHiddenArticles = async (): Promise<Article[]> => {
-  const response = await axiosInstance.get<Article[]>("/admin/articles/hidden");
+  const response = await axiosInstance.get<PaginatedResponse<Article>>(
+    `/admin/articles?${params.toString()}`
+  );
   return response.data;
 };
 
@@ -65,18 +76,26 @@ export const deleteNote = async (id: number): Promise<void> => {
   await axiosInstance.delete(`/admin/notes/${id}`);
 };
 
-export const getAllNotes = async (): Promise<Note[]> => {
-  const response = await axiosInstance.get<Note[]>("/admin/notes");
-  return response.data;
-};
+export const getAllNotes = async (
+  page: number = 1,
+  limit: number = 10,
+  status?: string,
+  sortField: string = "createdAt",
+  sortOrder: "asc" | "desc" = "desc",
+  search?: string
+): Promise<PaginatedResponse<Note>> => {
+  const params = new URLSearchParams({
+    page: page.toString(),
+    limit: limit.toString(),
+  });
+  if (status) params.append("status", status);
+  if (sortField) params.append("sortField", sortField);
+  if (sortOrder) params.append("sortOrder", sortOrder);
+  if (search) params.append("search", search);
 
-export const getPublishedNotes = async (): Promise<Note[]> => {
-  const response = await axiosInstance.get<Note[]>("/notes");
-  return response.data;
-};
-
-export const getHiddenNotes = async (): Promise<Note[]> => {
-  const response = await axiosInstance.get<Note[]>("/admin/notes/hidden");
+  const response = await axiosInstance.get<PaginatedResponse<Note>>(
+    `/admin/notes?${params.toString()}`
+  );
   return response.data;
 };
 
@@ -102,17 +121,23 @@ export const deleteThought = async (id: number): Promise<void> => {
   await axiosInstance.delete(`/admin/thoughts/${id}`);
 };
 
-export const getAllThoughts = async (): Promise<Thought[]> => {
-  const response = await axiosInstance.get<Thought[]>("/admin/thoughts");
-  return response.data;
-};
+export const getAllThoughts = async (
+  page: number = 1,
+  limit: number = 10,
+  status?: string,
+  sortOrder: "asc" | "desc" = "desc",
+  search?: string
+): Promise<PaginatedResponse<Thought>> => {
+  const params = new URLSearchParams({
+    page: page.toString(),
+    limit: limit.toString(),
+  });
+  if (status) params.append("status", status);
+  if (sortOrder) params.append("sortOrder", sortOrder);
+  if (search) params.append("search", search);
 
-export const getPublishedThoughts = async (): Promise<Thought[]> => {
-  const response = await axiosInstance.get<Thought[]>("/thoughts");
-  return response.data;
-};
-
-export const getHiddenThoughts = async (): Promise<Thought[]> => {
-  const response = await axiosInstance.get<Thought[]>("/admin/thoughts/hidden");
+  const response = await axiosInstance.get<PaginatedResponse<Thought>>(
+    `/admin/notes?${params.toString()}`
+  );
   return response.data;
 };

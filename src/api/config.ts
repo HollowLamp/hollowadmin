@@ -1,6 +1,13 @@
 import axios from "axios";
 import { notifications } from "@mantine/notifications";
 
+export interface PaginatedResponse<T> {
+  data: T[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
 export const axiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
   timeout: 3000,

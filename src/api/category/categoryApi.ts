@@ -1,5 +1,6 @@
 import { axiosInstance } from "../config";
 import { Category, CreateCategoryDto, UpdateCategoryDto } from "./types";
+import { PaginatedResponse } from "../config";
 
 export const createCategory = async (
   categoryData: CreateCategoryDto
@@ -26,7 +27,12 @@ export const deleteCategory = async (id: number): Promise<void> => {
   await axiosInstance.delete(`/admin/categories/${id}`);
 };
 
-export const getAllCategories = async (): Promise<Category[]> => {
-  const response = await axiosInstance.get<Category[]>("/admin/categories/");
+export const getAllCategories = async (
+  page = 1,
+  limit = 10
+): Promise<PaginatedResponse<Category>> => {
+  const response = await axiosInstance.get<PaginatedResponse<Category>>(
+    `/admin/categories?page=${page}&limit=${limit}`
+  );
   return response.data;
 };

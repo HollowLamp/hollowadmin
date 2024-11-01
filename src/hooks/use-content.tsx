@@ -1,23 +1,22 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  useQuery,
+  useMutation,
+  keepPreviousData,
+  useQueryClient,
+} from "@tanstack/react-query";
 import {
   createArticle,
   updateArticle,
   deleteArticle,
   getAllArticles,
-  getHiddenArticles,
-  getPublishedArticles,
   createNote,
   updateNote,
   deleteNote,
   getAllNotes,
-  getHiddenNotes,
-  getPublishedNotes,
   createThought,
   updateThought,
   deleteThought,
   getAllThoughts,
-  getHiddenThoughts,
-  getPublishedThoughts,
 } from "@/api/content/contentApi";
 import {
   Article,
@@ -30,23 +29,41 @@ import {
   CreateThoughtDto,
   UpdateThoughtDto,
 } from "@/api/content/types";
+import { PaginatedResponse } from "@/api/config";
 
-export const useArticles = () => {
+export const useArticles = (
+  page: number = 1,
+  limit: number = 10,
+  status?: string,
+  categoryId?: number,
+  sortField: string = "createdAt",
+  sortOrder: string = "desc",
+  search?: string
+) => {
   const queryClient = useQueryClient();
 
-  const getAll = useQuery<Article[]>({
-    queryKey: ["allArticles"],
-    queryFn: getAllArticles,
-  });
-
-  const getHidden = useQuery<Article[]>({
-    queryKey: ["hiddenArticles"],
-    queryFn: getHiddenArticles,
-  });
-
-  const getPublished = useQuery<Article[]>({
-    queryKey: ["publishedArticles"],
-    queryFn: getPublishedArticles,
+  const getAll = useQuery<PaginatedResponse<Article>>({
+    queryKey: [
+      "allArticles",
+      page,
+      limit,
+      status,
+      categoryId,
+      sortField,
+      sortOrder,
+      search,
+    ],
+    queryFn: () =>
+      getAllArticles(
+        page,
+        limit,
+        status,
+        categoryId,
+        sortField,
+        sortOrder,
+        search
+      ),
+    placeholderData: keepPreviousData,
   });
 
   const create = useMutation<Article, Error, CreateArticleDto>({
@@ -71,25 +88,24 @@ export const useArticles = () => {
       queryClient.invalidateQueries({ queryKey: ["allArticles"] }),
   });
 
-  return { getAll, getHidden, getPublished, create, update, remove };
+  return { getAll, create, update, remove, refetch: getAll.refetch };
 };
 
-export const useNotes = () => {
+export const useNotes = (
+  page: number = 1,
+  limit: number = 10,
+  status?: string,
+  sortField: string = "createdAt",
+  sortOrder: "asc" | "desc" = "desc",
+  search?: string
+) => {
   const queryClient = useQueryClient();
 
-  const getAll = useQuery<Note[]>({
-    queryKey: ["allNotes"],
-    queryFn: getAllNotes,
-  });
-
-  const getHidden = useQuery<Note[]>({
-    queryKey: ["hiddenNotes"],
-    queryFn: getHiddenNotes,
-  });
-
-  const getPublished = useQuery<Note[]>({
-    queryKey: ["publishedNotes"],
-    queryFn: getPublishedNotes,
+  const getAll = useQuery<PaginatedResponse<Note>>({
+    queryKey: ["allNotes", page, limit, status, sortField, sortOrder, search],
+    queryFn: () =>
+      getAllNotes(page, limit, status, sortField, sortOrder, search),
+    placeholderData: keepPreviousData,
   });
 
   const create = useMutation<Note, Error, CreateNoteDto>({
@@ -107,25 +123,22 @@ export const useNotes = () => {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["allNotes"] }),
   });
 
-  return { getAll, getHidden, getPublished, create, update, remove };
+  return { getAll, create, update, remove, refetch: getAll.refetch };
 };
 
-export const useThoughts = () => {
+export const useThoughts = (
+  page: number = 1,
+  limit: number = 10,
+  status?: string,
+  sortOrder: "asc" | "desc" = "desc",
+  search?: string
+) => {
   const queryClient = useQueryClient();
 
-  const getAll = useQuery<Thought[]>({
-    queryKey: ["allThoughts"],
-    queryFn: getAllThoughts,
-  });
-
-  const getHidden = useQuery<Thought[]>({
-    queryKey: ["hiddenThoughts"],
-    queryFn: getHiddenThoughts,
-  });
-
-  const getPublished = useQuery<Thought[]>({
-    queryKey: ["publishedThoughts"],
-    queryFn: getPublishedThoughts,
+  const getAll = useQuery<PaginatedResponse<Thought>>({
+    queryKey: ["allThoughts", page, limit, status, sortOrder, search],
+    queryFn: () => getAllThoughts(page, limit, status, sortOrder, search),
+    placeholderData: keepPreviousData,
   });
 
   const create = useMutation<Thought, Error, CreateThoughtDto>({
@@ -150,5 +163,5 @@ export const useThoughts = () => {
       queryClient.invalidateQueries({ queryKey: ["allThoughts"] }),
   });
 
-  return { getAll, getHidden, getPublished, create, update, remove };
+  return { getAll, create, update, remove, refetch: getAll.refetch };
 };
