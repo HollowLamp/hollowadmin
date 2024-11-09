@@ -3,8 +3,10 @@ import { useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 import Image from "@tiptap/extension-image";
+import Link from "@tiptap/extension-link";
 import { all, createLowlight } from "lowlight";
 import { useEffect, useState } from "react";
+import { Button, Select } from "@mantine/core";
 
 const lowlight = createLowlight(all);
 
@@ -23,6 +25,9 @@ const TextEditor: React.FC<TextEditorProps> = ({ content, setContent }) => {
         lowlight,
       }),
       Image,
+      Link.configure({
+        openOnClick: false,
+      }),
     ],
     content,
     onUpdate: ({ editor }) => {
@@ -36,21 +41,29 @@ const TextEditor: React.FC<TextEditorProps> = ({ content, setContent }) => {
     }
   }, [content, editor]);
 
-  const handleLanguageChange = (
-    event: React.ChangeEvent<HTMLSelectElement>
-  ) => {
-    setLanguage(event.target.value);
-    editor
-      ?.chain()
-      .focus()
-      .setCodeBlock({ language: event.target.value })
-      .run();
+  const handleLanguageChange = (value: string | null) => {
+    if (value) {
+      setLanguage(value);
+      editor?.chain().focus().setCodeBlock({ language: value }).run();
+    }
   };
 
   const addImage = () => {
     const url = prompt("输入图片URL");
     if (url) {
       editor?.chain().focus().setImage({ src: url }).run();
+    }
+  };
+
+  const addLink = () => {
+    const url = prompt("输入链接URL");
+    if (url) {
+      editor
+        ?.chain()
+        .focus()
+        .extendMarkRange("link")
+        .setLink({ href: url })
+        .run();
     }
   };
 
@@ -80,31 +93,33 @@ const TextEditor: React.FC<TextEditorProps> = ({ content, setContent }) => {
           <RichTextEditor.Undo />
           <RichTextEditor.Redo />
         </RichTextEditor.ControlsGroup>
-        <button onClick={addImage}>插入图片</button>
-        <select
+        <Button onClick={addImage}>插入图片</Button>
+        <Button onClick={addLink} style={{ marginLeft: "8px" }}>
+          插入链接
+        </Button>
+        <Select
           value={language}
           onChange={handleLanguageChange}
+          data={[
+            { value: "javascript", label: "JavaScript" },
+            { value: "python", label: "Python" },
+            { value: "html", label: "HTML" },
+            { value: "css", label: "CSS" },
+            { value: "typescript", label: "TypeScript" },
+            { value: "java", label: "Java" },
+            { value: "cpp", label: "C++" },
+            { value: "ruby", label: "Ruby" },
+            { value: "php", label: "PHP" },
+            { value: "go", label: "Go" },
+            { value: "json", label: "JSON" },
+            { value: "markdown", label: "Markdown" },
+          ]}
+          placeholder="选择语言"
           style={{
             marginLeft: "16px",
-            padding: "4px",
-            border: "1px solid #ccc",
-            borderRadius: "4px",
-            backgroundColor: "#f9f9f9",
+            width: "150px",
           }}
-        >
-          <option value="javascript">JavaScript</option>
-          <option value="python">Python</option>
-          <option value="html">HTML</option>
-          <option value="css">CSS</option>
-          <option value="typescript">TypeScript</option>
-          <option value="java">Java</option>
-          <option value="cpp">C++</option>
-          <option value="ruby">Ruby</option>
-          <option value="php">PHP</option>
-          <option value="go">Go</option>
-          <option value="json">JSON</option>
-          <option value="markdown">Markdown</option>
-        </select>
+        />
       </RichTextEditor.Toolbar>
       <RichTextEditor.Content />
     </RichTextEditor>
