@@ -6,7 +6,15 @@ import Image from "@tiptap/extension-image";
 import Link from "@tiptap/extension-link";
 import { all, createLowlight } from "lowlight";
 import { useEffect, useState } from "react";
-import { Button, Select } from "@mantine/core";
+import { Select, FileButton, ActionIcon, Tooltip } from "@mantine/core";
+import TurndownService from "turndown";
+import showdown from "showdown";
+import {
+  IconPhoto,
+  IconLink,
+  IconDownload,
+  IconUpload,
+} from "@tabler/icons-react";
 
 const lowlight = createLowlight(all);
 
@@ -67,6 +75,30 @@ const TextEditor: React.FC<TextEditorProps> = ({ content, setContent }) => {
     }
   };
 
+  const handleFileChange = async (file: File | null) => {
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const markdownContent = reader.result as string;
+      const converter = new showdown.Converter();
+      const htmlContent = converter.makeHtml(markdownContent);
+      editor?.commands.setContent(htmlContent);
+    };
+    reader.readAsText(file);
+  };
+
+  const exportMarkdown = () => {
+    const htmlContent = editor?.getHTML() || "";
+    const turndownService = new TurndownService();
+    const markdownContent = turndownService.turndown(htmlContent);
+    const blob = new Blob([markdownContent], { type: "text/markdown" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "content.md";
+    link.click();
+  };
+
   return (
     <RichTextEditor editor={editor}>
       <RichTextEditor.Toolbar>
@@ -93,10 +125,19 @@ const TextEditor: React.FC<TextEditorProps> = ({ content, setContent }) => {
           <RichTextEditor.Undo />
           <RichTextEditor.Redo />
         </RichTextEditor.ControlsGroup>
-        <Button onClick={addImage}>插入图片</Button>
-        <Button onClick={addLink} style={{ marginLeft: "8px" }}>
-          插入链接
-        </Button>
+
+        <Tooltip label="插入图片">
+          <ActionIcon onClick={addImage} style={{ marginLeft: "8px" }}>
+            <IconPhoto size={18} />
+          </ActionIcon>
+        </Tooltip>
+
+        <Tooltip label="插入链接">
+          <ActionIcon onClick={addLink} style={{ marginLeft: "8px" }}>
+            <IconLink size={18} />
+          </ActionIcon>
+        </Tooltip>
+
         <Select
           value={language}
           onChange={handleLanguageChange}
@@ -120,6 +161,22 @@ const TextEditor: React.FC<TextEditorProps> = ({ content, setContent }) => {
             width: "150px",
           }}
         />
+
+        <FileButton onChange={handleFileChange} accept=".md">
+          {(props) => (
+            <Tooltip label="导入 Markdown">
+              <ActionIcon {...props} style={{ marginLeft: "8px" }}>
+                <IconUpload size={18} />
+              </ActionIcon>
+            </Tooltip>
+          )}
+        </FileButton>
+
+        <Tooltip label="导出 Markdown">
+          <ActionIcon onClick={exportMarkdown} style={{ marginLeft: "8px" }}>
+            <IconDownload size={18} />
+          </ActionIcon>
+        </Tooltip>
       </RichTextEditor.Toolbar>
       <RichTextEditor.Content />
     </RichTextEditor>
