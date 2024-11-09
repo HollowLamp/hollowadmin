@@ -137,7 +137,7 @@ export const getAllThoughts = async (
   if (search) params.append("search", search);
 
   const response = await axiosInstance.get<PaginatedResponse<Thought>>(
-    `/admin/notes?${params.toString()}`
+    `/admin/thoughts?${params.toString()}`
   );
   return response.data;
 };
