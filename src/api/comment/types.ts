@@ -12,14 +12,3 @@ export interface Comment {
   clientIp?: string;
   userAgent?: string;
 }
-
-export interface CreateCommentDto {
-  content: string;
-  nickname?: string;
-  email?: string;
-  avatarUrl?: string;
-  website?: string;
-  articleSlug?: string;
-  noteId?: number;
-  thoughtId?: number;
-}

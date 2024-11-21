@@ -5,7 +5,6 @@ import {
   keepPreviousData,
 } from "@tanstack/react-query";
 import {
-  createComment,
   deleteComment,
   getAllComments,
   getIndependentComments,
@@ -13,7 +12,7 @@ import {
   getCommentsByNoteId,
   getCommentsByThoughtId,
 } from "@/api/comment/commentApi";
-import { Comment, CreateCommentDto } from "@/api/comment/types";
+import { Comment } from "@/api/comment/types";
 import { PaginatedResponse } from "@/api/config";
 
 export const useGetAllComments = (
@@ -77,16 +76,6 @@ export const useGetCommentsByThoughtId = (
     queryFn: () => getCommentsByThoughtId(thoughtId, page, limit),
     placeholderData: keepPreviousData,
     enabled: !!thoughtId,
-  });
-};
-
-export const useCreateComment = () => {
-  const queryClient = useQueryClient();
-  return useMutation<Comment, Error, CreateCommentDto>({
-    mutationFn: (commentData: CreateCommentDto) => createComment(commentData),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["allComments"] });
-    },
   });
 };
 

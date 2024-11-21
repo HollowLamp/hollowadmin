@@ -192,7 +192,10 @@ const CommentsTable = () => {
                   <div>
                     <Text size="sm">IP: {comment.clientIp || "未知"}</Text>
                     <Text size="xs" style={{ wordBreak: "break-word" }}>
-                      User-Agent: {comment.userAgent || "未知"}
+                      User-Agent:{" "}
+                      {comment.userAgent && comment.userAgent.length > 10
+                        ? `${comment.userAgent.slice(0, 10)}...`
+                        : comment.userAgent || "未知"}
                     </Text>
                   </div>
                 </Table.Td>
