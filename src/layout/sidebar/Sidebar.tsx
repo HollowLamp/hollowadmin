@@ -21,6 +21,7 @@ const navItems: NavItem[] = [
       { label: "查看内容", path: "/content/view" },
     ],
   },
+  { label: "评论", path: "/comment" },
 ];
 
 type SidebarItemProps = {

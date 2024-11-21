@@ -4,6 +4,7 @@ import Home from "@/pages/home/Home";
 import Category from "@/pages/category/Category";
 import CreateContent from "@/pages/content/create/CreateContent";
 import ViewContent from "@/pages/content/view/ViewContent";
+import Comment from "@/pages/comment/Comment";
 
 const routers = createBrowserRouter([
   {
@@ -15,6 +16,7 @@ const routers = createBrowserRouter([
       { path: "/content/edit/:id", element: <CreateContent /> },
       { path: "/content/create", element: <CreateContent /> },
       { path: "/content/view", element: <ViewContent /> },
+      { path: "/comment", element: <Comment /> },
     ],
   },
 ]);
