@@ -1,16 +1,6 @@
 import { axiosInstance } from "../config";
-import { Comment, CreateCommentDto } from "./types";
+import { Comment } from "./types";
 import { PaginatedResponse } from "../config";
-
-export const createComment = async (
-  commentData: CreateCommentDto
-): Promise<Comment> => {
-  const response = await axiosInstance.post<Comment>(
-    "/admin/comments",
-    commentData
-  );
-  return response.data;
-};
 
 export const deleteComment = async (id: number): Promise<void> => {
   await axiosInstance.delete(`/admin/comments/${id}`);
