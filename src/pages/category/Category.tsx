@@ -61,9 +61,9 @@ const Category = () => {
     validate: {
       name: (value) => (value ? null : "名称不能为空"),
       slug: (value) =>
-        /^[a-zA-Z0-9_]+$/.test(value)
+        !value || /^[a-zA-Z0-9-]+$/.test(value)
           ? null
-          : "Slug 只能包含字母、数字和下划线",
+          : "Slug 只能包含字母、数字和短横线",
     },
   });
 
@@ -74,9 +74,9 @@ const Category = () => {
     },
     validate: {
       slug: (value) =>
-        !value || /^[a-zA-Z0-9_]+$/.test(value)
+        !value || /^[a-zA-Z0-9-]+$/.test(value)
           ? null
-          : "Slug 只能包含字母、数字和下划线",
+          : "Slug 只能包含字母、数字和短横线",
     },
     transformValues: (values) => {
       const filteredEntries = Object.entries(values).filter(
