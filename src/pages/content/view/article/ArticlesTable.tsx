@@ -128,6 +128,7 @@ const ArticlesTable = () => {
           data={[
             { value: "createdAt", label: "创建时间" },
             { value: "updatedAt", label: "更新时间" },
+            { value: "views", label: "阅读量" },
           ]}
           value={sortField}
           onChange={(value) => setSortField(value as "createdAt" | "updatedAt")}
@@ -135,8 +136,8 @@ const ArticlesTable = () => {
         <Select
           placeholder="选择排序顺序"
           data={[
-            { value: "asc", label: "最早" },
-            { value: "desc", label: "最新" },
+            { value: "asc", label: "升序" },
+            { value: "desc", label: "降序" },
           ]}
           value={sortOrder}
           onChange={(value) => setSortOrder(value as "asc" | "desc")}
@@ -149,73 +150,75 @@ const ArticlesTable = () => {
         />
         <Button onClick={handleSearch}>搜索</Button>
       </Group>
-
-      <Table highlightOnHover>
-        <Table.Thead>
-          <Table.Tr>
-            <Table.Th>ID</Table.Th>
-            <Table.Th>标题</Table.Th>
-            <Table.Th>状态</Table.Th>
-            <Table.Th>分类</Table.Th>
-            <Table.Th>创建时间</Table.Th>
-            <Table.Th>更新时间</Table.Th>
-            <Table.Th>操作</Table.Th>
-          </Table.Tr>
-        </Table.Thead>
-        <Table.Tbody>
-          {articlesData.map((article) => (
-            <Table.Tr key={article.id}>
-              <Table.Td>{article.id}</Table.Td>
-              <Table.Td>{article.title}</Table.Td>
-              <Table.Td>
-                {article.status === "published" ? "已发布" : "隐藏"}
-              </Table.Td>
-              <Table.Td>
-                {
-                  categories.data.find(
-                    (category) => category.id === article.categoryId
-                  )?.name
-                }
-              </Table.Td>
-              <Table.Td>
-                {format(new Date(article.createdAt), "yyyy-MM-dd HH:mm:ss")}
-              </Table.Td>
-              <Table.Td>
-                {format(new Date(article.updatedAt), "yyyy-MM-dd HH:mm:ss")}
-              </Table.Td>
-              <Table.Td>
-                <Center>
-                  <Button
-                    variant="subtle"
-                    onClick={() =>
-                      navigate(`/content/edit/${article.id}`, {
-                        state: {
-                          contentType: "article",
-                          title: article.title,
-                          slug: article.slug,
-                          categoryId: article.categoryId,
-                          content: article.content,
-                          status: article.status,
-                        },
-                      })
-                    }
-                  >
-                    编辑
-                  </Button>
-                  <Button
-                    color="red"
-                    variant="subtle"
-                    onClick={() => openDeleteModal(article.id)}
-                  >
-                    删除
-                  </Button>
-                </Center>
-              </Table.Td>
+      <Table.ScrollContainer minWidth={500}>
+        <Table highlightOnHover>
+          <Table.Thead>
+            <Table.Tr>
+              <Table.Th>ID</Table.Th>
+              <Table.Th>标题</Table.Th>
+              <Table.Th>状态</Table.Th>
+              <Table.Th>分类</Table.Th>
+              <Table.Th>阅读量</Table.Th>
+              <Table.Th>创建时间</Table.Th>
+              <Table.Th>更新时间</Table.Th>
+              <Table.Th>操作</Table.Th>
             </Table.Tr>
-          ))}
-        </Table.Tbody>
-      </Table>
-
+          </Table.Thead>
+          <Table.Tbody>
+            {articlesData.map((article) => (
+              <Table.Tr key={article.id}>
+                <Table.Td>{article.id}</Table.Td>
+                <Table.Td>{article.title}</Table.Td>
+                <Table.Td>
+                  {article.status === "published" ? "已发布" : "隐藏"}
+                </Table.Td>
+                <Table.Td>
+                  {
+                    categories.data.find(
+                      (category) => category.id === article.categoryId
+                    )?.name
+                  }
+                </Table.Td>
+                <Table.Td>{article.views}</Table.Td>
+                <Table.Td>
+                  {format(new Date(article.createdAt), "yyyy-MM-dd HH:mm:ss")}
+                </Table.Td>
+                <Table.Td>
+                  {format(new Date(article.updatedAt), "yyyy-MM-dd HH:mm:ss")}
+                </Table.Td>
+                <Table.Td>
+                  <Center>
+                    <Button
+                      variant="subtle"
+                      onClick={() =>
+                        navigate(`/content/edit/${article.id}`, {
+                          state: {
+                            contentType: "article",
+                            title: article.title,
+                            slug: article.slug,
+                            categoryId: article.categoryId,
+                            content: article.content,
+                            status: article.status,
+                          },
+                        })
+                      }
+                    >
+                      编辑
+                    </Button>
+                    <Button
+                      color="red"
+                      variant="subtle"
+                      onClick={() => openDeleteModal(article.id)}
+                    >
+                      删除
+                    </Button>
+                  </Center>
+                </Table.Td>
+              </Table.Tr>
+            ))}
+          </Table.Tbody>
+        </Table>
+      </Table.ScrollContainer>
       <Pagination total={totalPages} value={page} onChange={setPage} mt="md" />
 
       <Modal

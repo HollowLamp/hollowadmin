@@ -102,6 +102,7 @@ const NotesTable = () => {
           data={[
             { value: "createdAt", label: "创建时间" },
             { value: "updatedAt", label: "更新时间" },
+            { value: "views", label: "阅读量" },
           ]}
           value={sortField}
           onChange={(value) => setSortField(value as "createdAt" | "updatedAt")}
@@ -109,8 +110,8 @@ const NotesTable = () => {
         <Select
           placeholder="选择排序顺序"
           data={[
-            { value: "asc", label: "最早" },
-            { value: "desc", label: "最新" },
+            { value: "asc", label: "升序" },
+            { value: "desc", label: "降序" },
           ]}
           value={sortOrder}
           onChange={(value) => setSortOrder(value as "asc" | "desc")}
@@ -123,63 +124,65 @@ const NotesTable = () => {
         />
         <Button onClick={handleSearch}>搜索</Button>
       </Group>
-
-      <Table highlightOnHover>
-        <Table.Thead>
-          <Table.Tr>
-            <Table.Th>ID</Table.Th>
-            <Table.Th>标题</Table.Th>
-            <Table.Th>状态</Table.Th>
-            <Table.Th>创建时间</Table.Th>
-            <Table.Th>更新时间</Table.Th>
-            <Table.Th>操作</Table.Th>
-          </Table.Tr>
-        </Table.Thead>
-        <Table.Tbody>
-          {notesData.map((note) => (
-            <Table.Tr key={note.id}>
-              <Table.Td>{note.id}</Table.Td>
-              <Table.Td>{note.title}</Table.Td>
-              <Table.Td>
-                {note.status === "published" ? "已发布" : "隐藏"}
-              </Table.Td>
-              <Table.Td>
-                {format(new Date(note.createdAt), "yyyy-MM-dd HH:mm:ss")}
-              </Table.Td>
-              <Table.Td>
-                {format(new Date(note.updatedAt), "yyyy-MM-dd HH:mm:ss")}
-              </Table.Td>
-              <Table.Td>
-                <Center>
-                  <Button
-                    variant="subtle"
-                    onClick={() =>
-                      navigate(`/content/edit/${note.id}`, {
-                        state: {
-                          contentType: "note",
-                          title: note.title,
-                          content: note.content,
-                          status: note.status,
-                        },
-                      })
-                    }
-                  >
-                    编辑
-                  </Button>
-                  <Button
-                    color="red"
-                    variant="subtle"
-                    onClick={() => openDeleteModal(note.id)}
-                  >
-                    删除
-                  </Button>
-                </Center>
-              </Table.Td>
+      <Table.ScrollContainer minWidth={500}>
+        <Table highlightOnHover>
+          <Table.Thead>
+            <Table.Tr>
+              <Table.Th>ID</Table.Th>
+              <Table.Th>标题</Table.Th>
+              <Table.Th>状态</Table.Th>
+              <Table.Th>阅读量</Table.Th>
+              <Table.Th>创建时间</Table.Th>
+              <Table.Th>更新时间</Table.Th>
+              <Table.Th>操作</Table.Th>
             </Table.Tr>
-          ))}
-        </Table.Tbody>
-      </Table>
-
+          </Table.Thead>
+          <Table.Tbody>
+            {notesData.map((note) => (
+              <Table.Tr key={note.id}>
+                <Table.Td>{note.id}</Table.Td>
+                <Table.Td>{note.title}</Table.Td>
+                <Table.Td>
+                  {note.status === "published" ? "已发布" : "隐藏"}
+                </Table.Td>
+                <Table.Td>{note.views}</Table.Td>
+                <Table.Td>
+                  {format(new Date(note.createdAt), "yyyy-MM-dd HH:mm:ss")}
+                </Table.Td>
+                <Table.Td>
+                  {format(new Date(note.updatedAt), "yyyy-MM-dd HH:mm:ss")}
+                </Table.Td>
+                <Table.Td>
+                  <Center>
+                    <Button
+                      variant="subtle"
+                      onClick={() =>
+                        navigate(`/content/edit/${note.id}`, {
+                          state: {
+                            contentType: "note",
+                            title: note.title,
+                            content: note.content,
+                            status: note.status,
+                          },
+                        })
+                      }
+                    >
+                      编辑
+                    </Button>
+                    <Button
+                      color="red"
+                      variant="subtle"
+                      onClick={() => openDeleteModal(note.id)}
+                    >
+                      删除
+                    </Button>
+                  </Center>
+                </Table.Td>
+              </Table.Tr>
+            ))}
+          </Table.Tbody>
+        </Table>
+      </Table.ScrollContainer>
       <Pagination total={totalPages} value={page} onChange={setPage} mt="md" />
 
       <Modal
