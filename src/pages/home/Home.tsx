@@ -348,12 +348,21 @@ const Home: React.FC = () => {
         value={timeRange}
         onChange={setTimeRange}
         mt="lg"
+        classNames={{
+          root: style.seg,
+        }}
       />
 
       <Grid gutter="lg" mt={10}>
-        {/* 折线图 - 阅读趋势 */}
         <Grid.Col span={{ base: 12 }}>
-          <Card shadow="sm" p="lg" style={{ width: "100%" }}>
+          <Card
+            shadow="sm"
+            p="lg"
+            style={{ width: "100%" }}
+            classNames={{
+              root: style.card,
+            }}
+          >
             <Text size="lg" ta="center" mb="md" fw={500}>
               阅读趋势
             </Text>
@@ -385,7 +394,14 @@ const Home: React.FC = () => {
         </Grid.Col>
 
         <Grid.Col span={{ base: 12, md: 6 }}>
-          <Card shadow="sm" p="lg" style={{ textAlign: "center" }}>
+          <Card
+            shadow="sm"
+            p="lg"
+            style={{ textAlign: "center" }}
+            classNames={{
+              root: style.card,
+            }}
+          >
             <Text size="lg" ta="center" mb="md" fw={500}>
               字数组成
             </Text>
@@ -400,7 +416,14 @@ const Home: React.FC = () => {
         </Grid.Col>
 
         <Grid.Col span={{ base: 12, md: 6 }}>
-          <Card shadow="sm" p="lg" style={{ textAlign: "center" }}>
+          <Card
+            shadow="sm"
+            p="lg"
+            style={{ textAlign: "center" }}
+            classNames={{
+              root: style.card,
+            }}
+          >
             <Text size="lg" ta="center" mb="md" fw={500}>
               阅读量组成
             </Text>
@@ -408,10 +431,11 @@ const Home: React.FC = () => {
               data={barChartData}
               dataKey="total"
               series={[
-                { name: "aritcle", color: "primary.6" },
+                { name: "aritcle", color: "primary.6", label: "文章" },
                 {
                   name: "note",
                   color: "secondary.6",
+                  label: "随笔",
                 },
               ]}
               h={400}
